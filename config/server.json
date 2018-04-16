@@ -1,0 +1,8 @@
+{
+    "server_names":[
+        "DBCache",
+        "WorldServer",
+        "GameServer",
+        "Gate"
+    ]
+}

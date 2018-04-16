@@ -29,16 +29,18 @@
         <legend>设置服务器时间</legend>
     </fieldset>
 
-
+    <div style="margin-left: 20px;">
+        <a>当前服务器时间：</a><a id="serverDate"></a>
+    </div></p>
     <form class="layui-form" action="" style="margin-left: 20px;">
 
 
         <div class="layui-form-item">
 
-                <div class="layui-input-inline">
-                    <input type="text" class="layui-input" name="date" id="date" placeholder="不填可还原时间">
-                </div>
-           
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="date" id="date" placeholder="不填可还原时间">
+            </div>
+
 
             <script>
                 layui.use('laydate', function () {
@@ -53,15 +55,53 @@
         </div>
 
         <div class="layui-form-item">
-            
-                <button class="layui-btn" lay-submit lay-filter="setTime">设置时间</button></p>
-                <button class="layui-btn" lay-submit lay-filter="resetServer">重启服务器</button>
-            
+
+            <button class="layui-btn" lay-submit lay-filter="setTime">设置时间</button>
+            <!-- </p> -->
+            <!-- <button class="layui-btn" lay-submit lay-filter="resetServer">重启服务器</button> -->
+
         </div>
     </form>
 
+    <div class="layui-form" style="width:500px;margin-left: 20px;">
+        <table class="layui-table" id="serverTable">
+
+            <thead>
+                <tr>
+                    <th>游戏进程</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>进程1</td>
+                    <td>获取中</td>
+
+                </tr>
+                <tr>
+                    <td>进程2</td>
+                    <td>获取中</td>
+
+                </tr>
+                <tr>
+                    <td>进程3</td>
+                    <td>获取中</td>
+
+                </tr>
+                <tr>
+                    <td>进程4</td>
+                    <td>获取中</td>
+
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    </p>
+
+
+
     <script>
-        //Demo
         layui.use('form', function () {
             var form = layui.form;
 
@@ -72,7 +112,7 @@
                     type: "POST",
                     url: "./ajax",
                     dataType: 'json',
-                    data: {code:"setTime",date:form.field.date},
+                    data: { code: "setTime", date: form.field.date },
                     success: function (msg) {
                         msg = JSON.stringify(msg);
                         layer.msg(msg);
@@ -89,16 +129,74 @@
                     type: "POST",
                     url: "./ajax",
                     dataType: 'json',
-                    data: {code:'resetServer'},
-                    success: function (msg) {  
+                    data: { code: 'resetServer' },
+                    success: function (msg) {
                         msg = JSON.stringify(msg);
-                        layer.msg(msg) 
-                    }  
+                        layer.msg(msg)
+                    }
                 });
                 return false;
             });
         });
     </script>
+
+    <script>
+
+        function checkServerState() {
+
+            $.ajax({
+                type: "POST",
+                url: "./ajax",
+                dataType: 'json',
+                data: { code: "checkServer" },
+                success: function (msg) {
+
+                    $("#serverTable tbody tr").each(function (i) {
+                        $(this).children("td:eq(1)").text(msg.status[i] == true ? '运行中' : '关闭中');
+                    });
+
+                    $("#serverDate").text(msg.date);
+                }
+            });
+        }
+        $(document).ready(function () {
+            setInterval("checkServerState()", 1000);
+        });
+    </script>
+
+    <script>
+        function onStartServer() {
+            $.ajax({
+                type: "POST",
+                url: "./ajax",
+                dataType: 'json',
+                data: { code: "startServer" },
+                success: function (msg) {
+                    msg = JSON.stringify(msg);
+                    layer.msg(msg);
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function onStopServer() {
+            $.ajax({
+                type: "POST",
+                url: "./ajax",
+                dataType: 'json',
+                data: { code: "stopServer" },
+                success: function (msg) {
+                    msg = JSON.stringify(msg);
+                    layer.msg(msg);
+                }
+            });
+        }
+    </script>
+
+    <button class="layui-btn" style="margin-left: 20px;" onclick="checkServerState()">立即刷新</button>
+    <button class="layui-btn" style="margin-left: 20px;" onclick="onStartServer()">启动服务器</button>
+    <button class="layui-btn layui-btn-danger" style="margin-left: 20px;" onclick="onStopServer()">关闭服务器</button>
 
 
 
